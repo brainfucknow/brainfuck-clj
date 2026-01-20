@@ -1,4 +1,5 @@
 (ns brainfuck-clj.core
+    (:require [brainfuck-clj.dsl :as dsl])
     (:gen-class))
 
 (defn bf-interpreter [program-code]
@@ -34,6 +35,21 @@
                 \]  (recur cells current-cell (find-bracket \] \[ instruction-pointer dec))
                 nil cells
                 (recur cells current-cell (inc instruction-pointer))))))
+
+(defn run-bf
+  "Run a Brainfuck program from a string."
+  [program-code]
+  (bf-interpreter program-code))
+
+(defn run-bf-file
+  "Run a Brainfuck program from a file."
+  [filename]
+  (bf-interpreter (slurp filename)))
+
+(defn run-dsl
+  "Run DSL-generated Brainfuck code."
+  [dsl-code]
+  (bf-interpreter dsl-code))
 
 (defn -main [& args]
   (if (nth args 0)
