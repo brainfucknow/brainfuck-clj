@@ -165,8 +165,10 @@
                                        cells)
                           curr-val (nth next-cells current-cell)
                           next-val (nth next-cells next-ptr)
-                          xor-result (bit-xor (.longValue curr-val) (.longValue next-val))]
-                      (recur (assoc next-cells current-cell (bigint xor-result)) 
+                          ;; Handle XOR for bigints safely
+                          xor-result (bigint (bit-xor (mod (.longValue curr-val) 256)
+                                                      (mod (.longValue next-val) 256)))]
+                      (recur (assoc next-cells current-cell xor-result) 
                              current-cell 
                              (inc instruction-pointer)))
                 
