@@ -184,6 +184,64 @@
                                    (assoc next-ptr 0N))]
                       (recur piped current-cell (inc instruction-pointer)))
                 
+                ;; Cryptic unreadable operators
+                \%  ;; Context-sensitive: inc if even, dec if odd
+                    (let [value (nth cells current-cell)
+                          even? (zero? (mod (.longValue value) 2))
+                          new-cells (if even?
+                                      (update-in cells [current-cell] inc)
+                                      (update-in cells [current-cell] dec))]
+                      (recur new-cells current-cell (inc instruction-pointer)))
+                
+                \?  ;; Conditional pointer move based on cell value
+                    (let [value (nth cells current-cell)
+                          new-ptr (cond
+                                   (pos? value) (inc current-cell)
+                                   (neg? value) (max 0 (dec current-cell))
+                                   :else current-cell)
+                          new-cells (if (and (pos? value) (= new-ptr (count cells)))
+                                      (conj cells 0N)
+                                      cells)]
+                      (recur new-cells new-ptr (inc instruction-pointer)))
+                
+                \!  ;; Invisible mutation: affects cell at current-2 silently
+                    (let [target (max 0 (- current-cell 2))
+                          new-cells (update-in cells [target] inc)]
+                      (recur new-cells current-cell (inc instruction-pointer)))
+                
+                \*  ;; Square current cell (multiply by itself)
+                    (let [value (nth cells current-cell)
+                          squared (* value value)]
+                      (recur (assoc cells current-cell squared) 
+                             current-cell 
+                             (inc instruction-pointer)))
+                
+                \:  ;; Rotate: shift all values right, wrap last to first
+                    (let [rotated (if (> (count cells) 1)
+                                    (vec (cons (last cells) (butlast cells)))
+                                    cells)]
+                      (recur rotated current-cell (inc instruction-pointer)))
+                
+                \^  ;; Elevate: move pointer to cell with value = current cell value
+                    (let [target-value (nth cells current-cell)
+                          target-index (or (first (keep-indexed 
+                                                   #(when (and (not= %1 current-cell)
+                                                              (= %2 target-value)) 
+                                                      %1) 
+                                                   cells))
+                                          current-cell)]
+                      (recur cells target-index (inc instruction-pointer)))
+                
+                \\;  ;; Ghost write: write to current AND a pseudo-random cell
+                     (let [ghost-cell (mod (* (+ current-cell 
+                                                 (mod (.longValue (nth cells current-cell)) 100)) 
+                                             7) 
+                                          (count cells))
+                           new-cells (-> cells
+                                       (update-in [current-cell] inc)
+                                       (update-in [ghost-cell] inc))]
+                       (recur new-cells current-cell (inc instruction-pointer)))
+                
                 nil cells
                 (recur cells current-cell (inc instruction-pointer))))))
 

@@ -134,3 +134,40 @@
     (let [result (bf-interpreter "++>+++[<|>-]")]
       ;; Should accumulate: 2 + 3 + 2 + 1 = 8
       (is (= [8N 0N] result)))))
+
+(deftest test-cryptic-operators
+  (testing "% operator: context-sensitive even/odd"
+    ;; Even value increments, odd value decrements
+    (let [result1 (bf-interpreter "++%")]  ;; 2 is even, becomes 3
+      (is (= [3N] result1)))
+    (let [result2 (bf-interpreter "+++%")]  ;; 3 is odd, becomes 2
+      (is (= [2N] result2))))
+  
+  (testing "? operator: conditional pointer move"
+    ;; Positive moves right, negative moves left, zero stays
+    ;; Verify by incrementing after the move
+    (let [result (bf-interpreter "++>+++<?+")]
+      (is (= [1N 3N] result))))  ;; Moved left from pos 1 to pos 0, then incremented
+  
+  (testing "! operator: invisible mutation at current-2"
+    (let [result (bf-interpreter ">>!!")]  ;; At pos 2, increments pos 0 twice
+      (is (= [2N 0N 0N] result))))
+  
+  (testing "* operator: square current cell"
+    (let [result (bf-interpreter "+++*")]  ;; 3 * 3 = 9
+      (is (= [9N] result))))
+  
+  (testing ": operator: rotate all cells right"
+    (let [result (bf-interpreter "++>+++>++++<:")]  ;; Tape [2, 3, 4] rotates to [4, 2, 3]
+      (is (= [4N 2N 3N] result))))
+  
+  (testing "^ operator: elevate to cell with matching value"
+    ;; Find cell with value 2
+    ;; Verify by incrementing after the elevation
+    (let [result (bf-interpreter "++>++>+++<^+")]
+      (is (= [3N 2N 3N] result))))  ;; Elevated to pos 0 (value 2), then incremented
+  
+  (testing "; operator: ghost write to random cell"
+    (let [result (bf-interpreter "++;")]  ;; Increments current and a ghost cell
+      ;; Total increments should be more than 3 (2 + 1 from ghost)
+      (is (>= (reduce + result) 3N)))))

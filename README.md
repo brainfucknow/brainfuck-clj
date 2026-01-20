@@ -1,6 +1,6 @@
 # brainfuck-clj
 
-A Brainfuck interpreter in Clojure with minimal Clojure-inspired syntax extensions.
+A Brainfuck interpreter in Clojure with cryptic syntax extensions. Readability not guaranteed.
 
 ## Features
 
@@ -9,6 +9,7 @@ This interpreter supports:
 - **Function Definitions**: `(name body)` to define reusable code blocks
 - **Do-While Loops**: `{body}` for loops that execute at least once
 - **Esoteric Operators**: 6 unconventional operators for weird cell manipulations
+- **Cryptic Operators**: 7 context-sensitive operators with non-obvious behaviors
 
 ## Usage
 
@@ -98,6 +99,48 @@ Result: [5, 0] - Next cell value "pipes" into current
 
 These operators enable non-obvious and esoteric programming patterns that would be verbose in standard Brainfuck.
 
+### Cryptic Operators
+
+Seven context-sensitive operators with ambiguous, non-obvious behaviors:
+
+**`%`** - Even/odd modifier: Increments if cell value is even, decrements if odd
+```brainfuck
+++%   # 2 is even → 3
++++%  # 3 is odd → 2
+```
+
+**`?`** - Conditional pointer: Moves right if cell>0, left if cell<0, stays if 0
+```brainfuck
+++?   # Positive → move right
+```
+
+**`!`** - Invisible mutation: Secretly increments cell at position current-2
+```brainfuck
+>>!!  # At pos 2, increments pos 0 twice silently
+```
+
+**`*`** - Square: Multiplies current cell by itself
+```brainfuck
++++*  # 3 × 3 = 9
+```
+
+**`:`** - Rotate: Shifts all cell values right, wrapping last to first
+```brainfuck
+++>+++:  # [2, 3] → [3, 2]
+```
+
+**`^`** - Elevate: Moves pointer to first cell with value matching current cell
+```brainfuck
+++>++^  # Finds other cell with value 2
+```
+
+**`;`** - Ghost write: Increments current cell AND pseudo-random distant cell
+```brainfuck
+++;  # Increments here and somewhere else simultaneously
+```
+
+These operators have side effects, context dependencies, and non-local behaviors that make code difficult to reason about.
+
 ## Examples
 
 See [doc/clojure-inspired-examples.md](doc/clojure-inspired-examples.md) for comprehensive examples.
@@ -124,14 +167,18 @@ Result: [6, 3]
 
 ## Why These Extensions?
 
-These extensions bring Clojure's philosophy of code reuse and unconventional thinking to Brainfuck:
+These extensions deliberately sacrifice readability for expressiveness:
 
-- **()** enables DRY principle with named, reusable code blocks
-- **{}** provides a common control flow pattern (do-while)
-- **Esoteric operators** (@~$&#|) add cryptic, unconventional cell manipulations
-- All integrate seamlessly with existing Brainfuck code
-- The syntax echoes Clojure's use of different symbols for different purposes
-- Makes the language weirder and more esoteric while remaining minimal
+- **()** enables DRY but obscures program flow
+- **{}** provides control flow that executes unexpectedly  
+- **Esoteric operators** (@~$&#|) perform cryptic, unintuitive operations
+- **Cryptic operators** (%?!*:^;) have context-dependent, non-obvious side effects
+- All integrate seamlessly, making code maximally confusing
+- The syntax uses similar-looking symbols for completely different operations
+- Makes the language intentionally unreadable and difficult to debug
+- Side effects occur in non-local cells without visual indication
+
+This is Brainfuck made worse - more powerful, but deliberately harder to understand.
 
 ## Implementation
 
