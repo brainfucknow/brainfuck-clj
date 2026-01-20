@@ -51,13 +51,13 @@ Result: cell 0 = 4
 ```
 +++++{-}
 ```
-Starts at 5, then decrements until zero. The body `-` executes 5 times.
+Starts with 5 in the cell, then decrements until zero. The body `-` executes 5 times.
 
 ### Example 5: Do-While with Move
 ```
 +++{>+<-}
 ```
-Moves value from cell 0 to cell 1. Result: [0, 3]
+Starts with 3 in the cell, moves value from cell 0 to cell 1. Result: [0, 3]
 
 ### Example 6: Combined Features
 ```
