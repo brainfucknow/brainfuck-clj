@@ -91,3 +91,46 @@
     ;; Define functions, use do-while, loops
     (let [result (bf-interpreter "(set3 +++)(set3)>>(set3)[<+>-]")]
       (is (= [3N 3N 0N] result)))))
+
+(deftest test-esoteric-operators
+  (testing "@ operator: tape echo (duplicate to next)"
+    (let [result (bf-interpreter "+++@")]
+      (is (= [3N 3N] result))))
+  
+  (testing "~ operator: invert/negate cell"
+    (let [result (bf-interpreter "+++~")]
+      (is (= [-3N] result))))
+  
+  (testing "$ operator: swap current and next cell"
+    (let [result (bf-interpreter "++>+++<$")]
+      (is (= [3N 2N] result))))
+  
+  (testing "& operator: mirror (copy next to current)"
+    (let [result (bf-interpreter "++>+++<&")]
+      (is (= [3N 3N] result))))
+  
+  (testing "# operator: quantum XOR"
+    (let [result (bf-interpreter "++>+++<#")]
+      ;; 2 XOR 3 = 1
+      (is (= [1N 3N] result))))
+  
+  (testing "| operator: pipe (add next to current, zero next)"
+    (let [result (bf-interpreter "++>+++<|")]
+      (is (= [5N 0N] result)))))
+
+(deftest test-esoteric-combinations
+  (testing "Esoteric operators with functions"
+    ;; Define echo function using @, then use it
+    (let [result (bf-interpreter "(echo @)(echo)++>(echo)")]
+      (is (= [2N 2N] result))))
+  
+  (testing "Chain esoteric operators"
+    ;; Set 5, echo to next, swap, invert first
+    (let [result (bf-interpreter "+++++@$~")]
+      (is (= [-5N 5N] result))))
+  
+  (testing "Esoteric in loops"
+    ;; Use pipe in a loop
+    (let [result (bf-interpreter "++>+++[<|>-]")]
+      ;; Should accumulate: 2 + 3 + 2 + 1 = 8
+      (is (= [8N 0N] result)))))

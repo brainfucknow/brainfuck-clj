@@ -8,6 +8,7 @@ This interpreter supports:
 - **Standard Brainfuck**: All 8 Brainfuck commands (+ - < > [ ] . ,)
 - **Function Definitions**: `(name body)` to define reusable code blocks
 - **Do-While Loops**: `{body}` for loops that execute at least once
+- **Esoteric Operators**: 6 unconventional operators for weird cell manipulations
 
 ## Usage
 
@@ -55,6 +56,48 @@ This increments to 3, then decrements in a loop until zero (executes 3 times tot
 
 This moves a value from one cell to another using a do-while pattern.
 
+### Esoteric Operators
+
+Six unconventional operators for weird cell manipulations:
+
+**`@` - Tape Echo**: Duplicates current cell value to the next cell
+```brainfuck
++++@
+```
+Result: [3, 3] - Current cell is copied to next
+
+**`~` - Invert**: Negates the current cell value (two's complement)
+```brainfuck
++++~
+```
+Result: [-3] - Cell value becomes negative
+
+**`$` - Swap**: Swaps current cell with the next cell
+```brainfuck
+++>+++<$
+```
+Result: [3, 2] - Cells are swapped
+
+**`&` - Mirror**: Copies next cell value to current cell
+```brainfuck
+++>+++<&
+```
+Result: [3, 3] - Next cell is copied to current
+
+**`#` - Quantum**: XORs current cell with next cell, stores in current
+```brainfuck
+++>+++<#
+```
+Result: [1, 3] - 2 XOR 3 = 1
+
+**`|` - Pipe**: Adds next cell to current, zeros next cell
+```brainfuck
+++>+++<|
+```
+Result: [5, 0] - Next cell value "pipes" into current
+
+These operators enable non-obvious and esoteric programming patterns that would be verbose in standard Brainfuck.
+
 ## Examples
 
 See [doc/clojure-inspired-examples.md](doc/clojure-inspired-examples.md) for comprehensive examples.
@@ -81,12 +124,14 @@ Result: [6, 3]
 
 ## Why These Extensions?
 
-These minimal extensions bring Clojure's philosophy of code reuse and composition to Brainfuck while maintaining its minimalist nature:
+These extensions bring Clojure's philosophy of code reuse and unconventional thinking to Brainfuck:
 
 - **()** enables DRY principle with named, reusable code blocks
 - **{}** provides a common control flow pattern (do-while)
-- Both integrate seamlessly with existing Brainfuck code
-- The syntax echoes Clojure's use of different bracket types for different purposes
+- **Esoteric operators** (@~$&#|) add cryptic, unconventional cell manipulations
+- All integrate seamlessly with existing Brainfuck code
+- The syntax echoes Clojure's use of different symbols for different purposes
+- Makes the language weirder and more esoteric while remaining minimal
 
 ## Implementation
 

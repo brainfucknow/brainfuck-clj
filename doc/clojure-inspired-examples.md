@@ -26,6 +26,17 @@ Execute body at least once, then loop while cell is non-zero:
 
 Translates to: `body[body]`
 
+### 3. Esoteric Operators
+
+Six unconventional operators for cryptic cell manipulations:
+
+- **`@`** (Tape Echo): Duplicates current cell to next cell
+- **`~`** (Invert): Negates current cell value
+- **`$`** (Swap): Swaps current and next cell
+- **`&`** (Mirror): Copies next cell to current
+- **`#`** (Quantum): XORs current with next cell
+- **`|`** (Pipe): Adds next to current, zeros next
+
 ## Examples
 
 ### Example 1: Simple Function
@@ -135,10 +146,63 @@ Executes the body 3 times, moving value to next cell.
 }
 ```
 
+## Esoteric Operator Examples
+
+### Example 11: Tape Echo (@) - Duplication
+```
++++@>@>@
+```
+Result: [3, 3, 3, 3] - Echoes value across cells
+
+### Example 12: Invert (~) - Negation Tricks
+```
++++++~++
+```
+Result: [-3] - Set to 5, negate to -5, add 2 = -3
+
+### Example 13: Swap ($) - Cell Shuffling
+```
+++>+++>++++<<$>$
+```
+Result: [3, 4, 2] - Swaps propagate values in weird ways
+
+### Example 14: Mirror (&) - Reflective Copying
+```
+>+++++<&>~<&
+```
+Result: [-5, 5] - Copy, negate, copy again creates mirror
+
+### Example 15: Quantum (#) - XOR Magic
+```
++++>++<#>@<#
+```
+Result: [0, 1] - XOR operations create cryptic patterns
+- Start: [3, 2]
+- After first #: [1, 2] (3 XOR 2 = 1)
+- After @: [1, 1]
+- After last #: [0, 1] (1 XOR 1 = 0)
+
+### Example 16: Pipe (|) - Value Accumulation
+```
+++>+++>++<<|>|
+```
+Result: [7, 0, 0] - Pipes all values leftward
+- Start: [2, 3, 2]
+- After first |: [5, 0, 2]
+- After second |: [7, 0, 0]
+
+### Example 17: Combined Esoteric Operators
+```
+(dupe @)(triplex >(dupe)>(dupe))
++++(triplex)$~&|
+```
+Combines multiple operators in cryptic ways for maximum weirdness
+
 ## Notes
 
 - Functions are expanded before execution
 - Nested function calls in definitions are supported
 - Do-while loops execute body at least once
+- Esoteric operators enable non-obvious programming patterns
 - All standard Brainfuck operations still work
 - Comments can be added as any non-BF characters

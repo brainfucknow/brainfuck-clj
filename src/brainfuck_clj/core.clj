@@ -120,6 +120,68 @@
                         (find-bracket \[ \] instruction-pointer inc)
                         instruction-pointer)))
                 \]  (recur cells current-cell (find-bracket \] \[ instruction-pointer dec))
+                
+                ;; Esoteric operators
+                \@  ;; Tape echo: duplicate current cell to next cell
+                    (let [next-ptr (inc current-cell)
+                          next-cells (if (= next-ptr (count cells)) 
+                                       (conj cells 0N) 
+                                       cells)
+                          value (nth next-cells current-cell)
+                          result-cells (assoc next-cells next-ptr value)]
+                      (recur result-cells current-cell (inc instruction-pointer)))
+                
+                \~  ;; Invert: negate current cell (two's complement style)
+                    (recur (update-in cells [current-cell] #(- (bigint %))) 
+                           current-cell 
+                           (inc instruction-pointer))
+                
+                \$  ;; Swap: swap current and next cell
+                    (let [next-ptr (inc current-cell)
+                          next-cells (if (= next-ptr (count cells)) 
+                                       (conj cells 0N) 
+                                       cells)
+                          curr-val (nth next-cells current-cell)
+                          next-val (nth next-cells next-ptr)
+                          swapped (-> next-cells
+                                     (assoc current-cell next-val)
+                                     (assoc next-ptr curr-val))]
+                      (recur swapped current-cell (inc instruction-pointer)))
+                
+                \&  ;; Mirror: copy next cell to current
+                    (let [next-ptr (inc current-cell)
+                          next-cells (if (= next-ptr (count cells)) 
+                                       (conj cells 0N) 
+                                       cells)
+                          next-val (nth next-cells next-ptr)]
+                      (recur (assoc next-cells current-cell next-val) 
+                             current-cell 
+                             (inc instruction-pointer)))
+                
+                \#  ;; Quantum: XOR current with next cell
+                    (let [next-ptr (inc current-cell)
+                          next-cells (if (= next-ptr (count cells)) 
+                                       (conj cells 0N) 
+                                       cells)
+                          curr-val (nth next-cells current-cell)
+                          next-val (nth next-cells next-ptr)
+                          xor-result (bit-xor (.longValue curr-val) (.longValue next-val))]
+                      (recur (assoc next-cells current-cell (bigint xor-result)) 
+                             current-cell 
+                             (inc instruction-pointer)))
+                
+                \|  ;; Pipe: add next to current, zero next
+                    (let [next-ptr (inc current-cell)
+                          next-cells (if (= next-ptr (count cells)) 
+                                       (conj cells 0N) 
+                                       cells)
+                          curr-val (nth next-cells current-cell)
+                          next-val (nth next-cells next-ptr)
+                          piped (-> next-cells
+                                   (assoc current-cell (+ curr-val next-val))
+                                   (assoc next-ptr 0N))]
+                      (recur piped current-cell (inc instruction-pointer)))
+                
                 nil cells
                 (recur cells current-cell (inc instruction-pointer))))))
 
