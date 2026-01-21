@@ -62,10 +62,15 @@
 (defn expand-functions [program-code functions]
   (expand-calls program-code functions))
 
+;; Remove all letter characters from the code
+(defn strip-letters [code]
+  (apply str (filter #(not (Character/isLetter %)) code)))
+
 ;; Preprocess program to expand () function definitions and {} do-while loops
 (defn preprocess [program-code]
-  (let [functions (parse-functions program-code)
-        expanded (expand-functions program-code functions)]
+  (let [no-letters (strip-letters program-code)
+        functions (parse-functions no-letters)
+        expanded (expand-functions no-letters functions)]
     ;; Now handle {} do-while loops
     ;; { body } becomes: body [ body ]
     (loop [i 0

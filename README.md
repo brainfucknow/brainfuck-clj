@@ -1,15 +1,16 @@
 # brainfuck-clj
 
-A Brainfuck interpreter in Clojure with cryptic syntax extensions. Readability not guaranteed.
+A Brainfuck interpreter in Clojure with cryptic syntax extensions. Readability not guaranteed. **Letters not allowed.**
 
 ## Features
 
 This interpreter supports:
 - **Standard Brainfuck**: All 8 Brainfuck commands (+ - < > [ ] . ,)
-- **Function Definitions**: `(name body)` to define reusable code blocks
+- **Function Definitions**: `(name body)` to define reusable code blocks (symbols only, no letters)
 - **Do-While Loops**: `{body}` for loops that execute at least once
 - **Esoteric Operators**: 6 unconventional operators for weird cell manipulations
 - **Cryptic Operators**: 7 context-sensitive operators with non-obvious behaviors
+- **Letter Stripping**: All letter characters (a-z, A-Z) are automatically removed from code
 
 ## Usage
 
@@ -23,23 +24,27 @@ You can find a few samples in the directory brainfuck-samples, e.g. to get all s
 lein run brainfuck-samples/squares.b 
 ```
 
+**Note:** Any letters in your code will be silently removed before execution. Use symbols and numbers only.
+
 ## Clojure-Inspired Extensions
 
 ### Function Definitions with ()
 
-Define reusable code blocks using parentheses:
+Define reusable code blocks using parentheses (symbols only, no letters):
 
 ```brainfuck
-(inc5 +++++)(inc5)
+(_5 +++++)(_5)
 ```
 
-This defines a function `inc5` that increments a cell by 5, then calls it.
+This defines a function `_5` that increments a cell by 5, then calls it. Function names can only contain symbols and numbers.
 
 Functions can reference other functions:
 
 ```brainfuck
-(add2 ++)(add4 ++(add2))(add4)
+(_2 ++)(_4 ++(_2))(_4)
 ```
+
+**Important:** Letter characters are not allowed. Use symbols like `_`, `@`, `$`, numbers, etc. for function names.
 
 ### Do-While Loops with {}
 
@@ -147,9 +152,9 @@ See [doc/clojure-inspired-examples.md](doc/clojure-inspired-examples.md) for com
 
 ### Quick Examples
 
-**Define and use a function:**
+**Define and use a function (symbols only):**
 ```brainfuck
-(set10 ++++++++++)(set10)>(set10)
+(_10 ++++++++++)(_10)>(_10)
 ```
 Result: Two cells set to 10
 
@@ -159,9 +164,9 @@ Result: Two cells set to 10
 ```
 Result: Moves 5 from cell 0 to cell 1: [0, 5]
 
-**Combined features:**
+**Combined features (symbols only):**
 ```brainfuck
-(inc +++)(inc)(inc)>(inc)
+(_+ +++)(_+)(_+)>(_+)
 ```
 Result: [6, 3]
 
@@ -169,8 +174,9 @@ Result: [6, 3]
 
 These extensions deliberately sacrifice readability for expressiveness:
 
-- **()** enables DRY but obscures program flow
+- **()** enables DRY but obscures program flow - function names use symbols only
 - **{}** provides control flow that executes unexpectedly  
+- **Letter stripping** removes all alphabetic characters, preventing descriptive names
 - **Esoteric operators** (@~$&#|) perform cryptic, unintuitive operations
 - **Cryptic operators** (%?!*:^;) have context-dependent, non-obvious side effects
 - All integrate seamlessly, making code maximally confusing
@@ -178,7 +184,7 @@ These extensions deliberately sacrifice readability for expressiveness:
 - Makes the language intentionally unreadable and difficult to debug
 - Side effects occur in non-local cells without visual indication
 
-This is Brainfuck made worse - more powerful, but deliberately harder to understand.
+This is Brainfuck made worse - more powerful, but deliberately harder to understand. Letters are banned.
 
 ## Implementation
 

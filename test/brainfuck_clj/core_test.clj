@@ -41,22 +41,22 @@
 
 (deftest test-function-definitions
   (testing "Simple function definition and call"
-    ;; Define inc5 as +++++, then call it
-    (let [result (bf-interpreter "(inc5 +++++)(inc5)")]
+    ;; Define _5 as +++++, then call it (no letters allowed)
+    (let [result (bf-interpreter "(_5 +++++)(_5)")]
       (is (= [5N] result))))
   
   (testing "Multiple function definitions"
-    ;; Define inc3 and inc2, call both
-    (let [result (bf-interpreter "(inc3 +++)(inc2 ++)(inc3)(inc2)")]
+    ;; Define _3 and _2, call both (no letters allowed)
+    (let [result (bf-interpreter "(_3 +++)(_2 ++)(_3)(_2)")]
       (is (= [5N] result))))
   
   (testing "Function with loop"
-    ;; Define move3 that moves value 3 cells right
-    (let [result (bf-interpreter "(move3 [>>>+<<<-])++(move3)")]
+    ;; Define _@ that moves value 3 cells right (no letters allowed)
+    (let [result (bf-interpreter "(_@ [>>>+<<<-])++(_@)")]
       (is (= [0N 0N 0N 2N] result))))
   
   (testing "Function calls in sequence"
-    (let [result (bf-interpreter "(inc +++)(inc)(inc)>(inc)")]
+    (let [result (bf-interpreter "(_+ +++)(_+)(_+)>(_+)")]
       (is (= [6N 3N] result)))))
 
 (deftest test-do-while-loops
@@ -78,18 +78,18 @@
 
 (deftest test-combined-features
   (testing "Functions and do-while together"
-    ;; Define inc5, call it, then use do-while to move value
-    (let [result (bf-interpreter "(inc5 +++++)(inc5){>+<-}")]
+    ;; Define _5, call it, then use do-while to move value (no letters allowed)
+    (let [result (bf-interpreter "(_5 +++++)(_5){>+<-}")]
       (is (= [0N 5N] result))))
   
   (testing "Nested functions"
-    ;; Define a function that calls another indirectly via its body
-    (let [result (bf-interpreter "(add2 ++)(add4 ++(add2))>(add4)")]
+    ;; Define a function that calls another indirectly via its body (no letters allowed)
+    (let [result (bf-interpreter "(_2 ++)(_4 ++(_2))>(_4)")]
       (is (= [0N 4N] result))))
   
   (testing "Complex program with all features"
-    ;; Define functions, use do-while, loops
-    (let [result (bf-interpreter "(set3 +++)(set3)>>(set3)[<+>-]")]
+    ;; Define functions, use do-while, loops (no letters allowed)
+    (let [result (bf-interpreter "(_3 +++)(_3)>>(_3)[<+>-]")]
       (is (= [3N 3N 0N] result)))))
 
 (deftest test-esoteric-operators
@@ -120,8 +120,8 @@
 
 (deftest test-esoteric-combinations
   (testing "Esoteric operators with functions"
-    ;; Define echo function using @, then use it
-    (let [result (bf-interpreter "(echo @)(echo)++>(echo)")]
+    ;; Define function using @, then use it (no letters allowed)
+    (let [result (bf-interpreter "(_@ @)(_@)++>(_@)")]
       (is (= [2N 2N] result))))
   
   (testing "Chain esoteric operators"
