@@ -1,4 +1,5 @@
 (ns brainfuck-clj.core
+    (:require [clojure.string :as str])
     (:gen-class))
 
 ;; Expand function calls in a string recursively
@@ -17,7 +18,7 @@
                                                      (recur (inc j) (dec depth)))
                               :else (recur (inc j) depth)))
               content (subs code (inc i) close-paren)
-              trimmed (clojure.string/trim content)]
+              trimmed (str/trim content)]
           ;; If it's just a name and exists in functions, expand it
           (if (and (not (.contains trimmed " "))
                    (contains? functions trimmed))
@@ -45,13 +46,13 @@
                                                              (recur (inc j) (dec depth)))
                               :else (recur (inc j) depth)))
               content (subs program-code (inc i) close-paren)
-              trimmed (clojure.string/trim content)]
+              trimmed (str/trim content)]
           ;; Check if it's a definition (contains space) or call (no space)
           (if (.contains trimmed " ")
             ;; It's a definition: parse name and body
             (let [space-idx (.indexOf trimmed " ")
                   func-name (subs trimmed 0 space-idx)
-                  func-body (clojure.string/trim (subs trimmed (inc space-idx)))]
+                  func-body (str/trim (subs trimmed (inc space-idx)))]
               (recur (inc close-paren) (assoc functions func-name func-body)))
             ;; It's a call or empty, skip it
             (recur (inc close-paren) functions)))
@@ -66,32 +67,38 @@
 (defn strip-letters [code]
   (apply str (filter #(not (Character/isLetter %)) code)))
 
+;; Recursively expand {} do-while loops in a code string.
+;; { body } becomes: body [ body ], with nested {} in body also expanded.
+(defn expand-braces [code]
+  (loop [i 0
+         result ""]
+    (if (>= i (count code))
+      result
+      (if (= \{ (nth code i))
+        ;; Found opening brace, parse do-while body
+        (let [close-brace (loop [j (inc i) depth 1]
+                            (cond
+                              (>= j (count code)) j
+                              (= \{ (nth code j)) (recur (inc j) (inc depth))
+                              (= \} (nth code j)) (if (= depth 1)
+                                                     j
+                                                     (recur (inc j) (dec depth)))
+                              :else (recur (inc j) depth)))
+              body (subs code (inc i) close-brace)
+              ;; Recursively expand any nested {} in the body
+              expanded-body (expand-braces body)
+              ;; Do-while: execute body, then loop while cell is non-zero
+              do-while (str expanded-body "[" expanded-body "]")]
+          (recur (inc close-brace) (str result do-while)))
+        (recur (inc i) (str result (nth code i)))))))
+
 ;; Preprocess program to expand () function definitions and {} do-while loops
 (defn preprocess [program-code]
   (let [no-letters (strip-letters program-code)
         functions (parse-functions no-letters)
         expanded (expand-functions no-letters functions)]
-    ;; Now handle {} do-while loops
-    ;; { body } becomes: body [ body ]
-    (loop [i 0
-           result ""]
-      (if (>= i (count expanded))
-        result
-        (if (= \{ (nth expanded i))
-          ;; Found opening brace, parse do-while body
-          (let [close-brace (loop [j (inc i) depth 1]
-                              (cond
-                                (>= j (count expanded)) j
-                                (= \{ (nth expanded j)) (recur (inc j) (inc depth))
-                                (= \} (nth expanded j)) (if (= depth 1) 
-                                                           j 
-                                                           (recur (inc j) (dec depth)))
-                                :else (recur (inc j) depth)))
-                body (subs expanded (inc i) close-brace)
-                ;; Do-while: execute body, then loop while cell is non-zero
-                do-while (str body "[" body "]")]
-            (recur (inc close-brace) (str result do-while)))
-          (recur (inc i) (str result (nth expanded i))))))))
+    ;; Now handle {} do-while loops (including nested ones)
+    (expand-braces expanded)))
 
 (defn bf-interpreter [program-code]
     (let [
@@ -237,7 +244,7 @@
                                           current-cell)]
                       (recur cells target-index (inc instruction-pointer)))
                 
-                \\;  ;; Ghost write: write to current AND a pseudo-random cell
+                \;  ;; Ghost write: write to current AND a pseudo-random cell
                      (let [ghost-cell (mod (* (+ current-cell 
                                                  (mod (.longValue (nth cells current-cell)) 100)) 
                                              7) 

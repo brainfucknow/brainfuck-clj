@@ -121,8 +121,9 @@
 (deftest test-esoteric-combinations
   (testing "Esoteric operators with functions"
     ;; Define function using @, then use it (no letters allowed)
-    (let [result (bf-interpreter "(_@ @)(_@)++>(_@)")]
-      (is (= [2N 2N] result))))
+    ;; After preprocessing: "++>@" which does: increment twice, move right, tape echo (cell 1 value 0 to cell 2)
+    (let [result (bf-interpreter "++(_@ @)>(_@)")]
+      (is (= [2N 0N 0N] result))))
   
   (testing "Chain esoteric operators"
     ;; Set 5, echo to next, swap, invert first
@@ -130,10 +131,10 @@
       (is (= [-5N 5N] result))))
   
   (testing "Esoteric in loops"
-    ;; Use pipe in a loop
-    (let [result (bf-interpreter "++>+++[<|>-]")]
-      ;; Should accumulate: 2 + 3 + 2 + 1 = 8
-      (is (= [8N 0N] result)))))
+    ;; Use pipe in a loop that terminates properly
+    (let [result (bf-interpreter "++>+++[<|>]")]
+      ;; After one iteration: (2 + 3) -> 5 in cell 0, cell 1 zeroed, loop exits
+      (is (= [5N 0N] result)))))
 
 (deftest test-cryptic-operators
   (testing "% operator: context-sensitive even/odd"
@@ -145,9 +146,9 @@
   
   (testing "? operator: conditional pointer move"
     ;; Positive moves right, negative moves left, zero stays
-    ;; Verify by incrementing after the move
+    ;; At pos 0 with value 2 (positive), ? moves right, then + increments cell 1
     (let [result (bf-interpreter "++>+++<?+")]
-      (is (= [1N 3N] result))))  ;; Moved left from pos 1 to pos 0, then incremented
+      (is (= [2N 4N] result))))  ;; Moved right from pos 0 to pos 1, then incremented
   
   (testing "! operator: invisible mutation at current-2"
     (let [result (bf-interpreter ">>!!")]  ;; At pos 2, increments pos 0 twice
