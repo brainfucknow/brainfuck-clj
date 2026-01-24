@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    
+    - name: Cache Maven repository
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-m2-${{ hashFiles('project.clj') }}
+        restore-keys: |
+          ${{ runner.os }}-m2-
+    
+    - name: Setup Clojure and Leiningen
+      uses: DeLaGuardo/setup-clojure@12.5
+      with:
+        lein: '2.11.2'
+    
+    - name: Install dependencies
+      run: lein deps
+    
+    - name: Run tests
+      run: lein test
+    
+    - name: Build uberjar
+      run: lein uberjar
