@@ -32,9 +32,21 @@
   (loop [i 0
          functions {}]
     (if (>= i (count program-code))
-      ;; After parsing all functions, expand calls in function bodies
-      (into {} (for [[name body] functions]
-                 [name (expand-calls body functions)]))
+      ;; After parsing all functions, recursively expand calls in function bodies until fixed point
+      ;; This handles multi-level composition like _9 calling _2 calling _1
+      (loop [current-functions functions
+             iteration 0]
+        (if (> iteration 100)  ;; Cycle detection: bail after 100 iterations
+          (throw (Exception. "Circular function definitions detected or too deep nesting"))
+          (let [expanded-functions (into {} (for [[name body] current-functions]
+                                              [name (expand-calls body current-functions)]))
+                ;; Check if we've reached a fixed point (no more changes)
+                fixed-point? (every? (fn [[name body]]
+                                      (= body (get current-functions name)))
+                                    expanded-functions)]
+            (if fixed-point?
+              expanded-functions
+              (recur expanded-functions (inc iteration))))))
       (if (= \( (nth program-code i))
         ;; Found opening paren, parse function definition
         (let [close-paren (loop [j (inc i) depth 1]

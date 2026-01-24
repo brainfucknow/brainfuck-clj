@@ -57,7 +57,12 @@
   
   (testing "Function calls in sequence"
     (let [result (bf-interpreter "(_+ +++)(_+)(_+)>(_+)")]
-      (is (= [6N 3N] result)))))
+      (is (= [6N 3N] result))))
+  
+  (testing "Multi-level nested function composition"
+    ;; Define _1 as +, _2 as _1 _1 (should expand to ++), _9 as _2 _2 _2 _1 (should expand to ++++++)
+    (let [result (bf-interpreter "(_1 +)(_2 (_1)(_1))(_9 (_2)(_2)(_2)(_1))(_9)")]
+      (is (= [7N] result)))))
 
 (deftest test-do-while-loops
   (testing "Do-while executes body and loops while non-zero"
