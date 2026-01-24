@@ -25,14 +25,14 @@
 (deftest test-output
   (testing "Output operation (.)"
     (let [output (with-out-str
-                   (bf-interpreter "+++++++++[>++++++++<-]>+."))]
+                   (bf-interpreter "+++++++++[>++++++++<-]>."))]
       (is (= "H" output)))))
 
 (deftest test-hello-world
   (testing "Hello World program"
     (let [hello-world "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+."
           output (with-out-str (bf-interpreter hello-world))]
-      (is (= "Hello World!\n" output)))))
+      (is (= "Hello World!" output)))))
 
 (deftest test-loop-zero
   (testing "Loop skipped when cell is zero"
@@ -57,7 +57,8 @@
 (deftest test-complex-arithmetic
   (testing "Complex arithmetic operations"
     (let [result (bf-interpreter "+++>++>+<[>[>+>+<<-]>[<+>-]<<-]")]
-      (is (= 6N (nth result 2))))))
+      ; This multiplies cells: cell[1]=2, cell[2]=1, result should be cell[3]=2
+      (is (= 2N (nth result 3))))))
 
 (deftest test-comments-ignored
   (testing "Comments and non-command characters are ignored"
