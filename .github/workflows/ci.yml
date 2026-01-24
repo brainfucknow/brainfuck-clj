@@ -30,12 +30,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-m2-
     
-    - name: Install Leiningen
-      run: |
-        wget https://raw.githubusercontent.com/technomancy/leiningen/2.11.2/bin/lein
-        chmod +x lein
-        sudo mv lein /usr/local/bin/
-        lein version
+    - name: Setup Clojure and Leiningen
+      uses: DeLaGuardo/setup-clojure@12.5
+      with:
+        lein: '2.11.2'
     
     - name: Install dependencies
       run: lein deps
