@@ -21,7 +21,7 @@ jobs:
     
     - name: Install Leiningen
       run: |
-        wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+        wget https://raw.githubusercontent.com/technomancy/leiningen/2.11.2/bin/lein
         chmod +x lein
         sudo mv lein /usr/local/bin/
         lein version
