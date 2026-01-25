@@ -189,9 +189,9 @@ This is Brainfuck made worse - more powerful, but deliberately harder to underst
 ## Implementation
 
 The interpreter preprocesses the code to:
-1. Parse function definitions and expand nested calls
-2. Transform do-while loops into Brainfuck equivalents
-3. Execute the resulting standard Brainfuck code
+1. Parse function definitions `()` and expand nested calls
+2. Transform do-while loops `{}` into Brainfuck-equivalent control flow
+3. Execute the resulting mix of standard Brainfuck commands and extended operators
 
-All extensions are syntactic sugar that compile to pure Brainfuck before execution.
-
+Only function definitions `()` and do-while loops `{}` are expanded during preprocessing; esoteric and cryptic operators (`@~$&#|%?!*:^;`) are executed directly by the interpreter and are not rewritten into standard Brainfuck.
+All pure Brainfuck programs remain valid and behave the same, but note that some characters that were previously ignored (such as `:` and `;`) now have defined semantics when used, so code relying on them as no-op comments may change behavior.
